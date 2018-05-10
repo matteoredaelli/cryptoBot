@@ -1,5 +1,11 @@
 # cryptoBot
 
+## SETUP
+
+- Edit configuration files under "etc" folder
+- setup environemnt variables for api_key and secret for your exchange: for instance BINANCE_KEY and BINANCE_SECRET
+
+
 ## USAGE
 
 ```
