@@ -1,4 +1,7 @@
-import getopt, sys
+#!/usr/bin/env python3
+
+import sys
+import argparse
 import configparser
 import logging
 import logging.config
@@ -22,7 +25,6 @@ import logging
 import logging.config
 
 logging.config.fileConfig('etc/logging.toml')
-
 # create logger
 logger = logging.getLogger('app')
 
@@ -41,41 +43,35 @@ def db_load(db, name):
     data = db.load(name)
     print(data)
 
+
+banner = """
+                       _          ____        _
+  ___ _ __ _   _ _ __ | |_ ___   | __ )  ___ | |_
+ / __| '__| | | | '_ \| __/ _ \  |  _ \ / _ \| __|
+| (__| |  | |_| | |_) | || (_) | | |_) | (_) | |_
+ \___|_|   \__, | .__/ \__\___/  |____/ \___/ \__|
+           |___/|_|
+"""
+
 def main():
     db = database.DB(config["DATABASE"]['path'])
     exchange = exchanges.connect_exchange(config["EXCHANGE"]["exchange"])
+    print(banner)
+    parser = argparse.ArgumentParser(description='CryptoBot command line utility')
+    parser.add_argument('CMD', metavar='CMD',
+                help='db_load|fetch_ohlcvs|fetch_tickers')
+    parser.add_argument('ARG', nargs='*', help='optional argument')
 
-    logger.info("begin")
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hc:va:", ["help", "cmd=", "verbose", "args"])
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(err) # will print something like "option -a not recognized"
-        #usage()
-        sys.exit(2)
-    cmd = None
-    verbose = False
-    for o, a in opts:
-        if o == "-v":
-            verbose = True
-        elif o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif o in ("-c", "--cmd"):
-            cmd = a
-        elif o in ("-a", "--args"):
-            args = a
-        else:
-            assert False, "unhandled option"
+    args = parser.parse_args()
 
-    if cmd == "fetch_tickers":
+    if args.CMD == "fetch_tickers":
         fetch_tickers(exchange, db)
-    elif cmd == "fetch_ohlcvs":
+    elif args.CMD == "fetch_ohlcvs":
         fetch_ohlcvs(exchange, db, config["EXCHANGE"]["symbols"].split(" "), config["EXCHANGE"]["timeframe"])
-    elif cmd == "db_load":
-        db_load(db, args)
+    elif args.CMD == "db_load":
+        db_load(db, args.ARG[0])
 
-    logger.info("end")
+    # logger.info("end")
 
 if __name__ == '__main__':
     main()
