@@ -1,0 +1,8 @@
+[EXCHANGE]
+exchange = binance
+#ohlcv_frequency = 60
+symbols = BTC/USDT ETH/BTC
+timeframe=1h
+
+[DATABASE]
+path = ./db
